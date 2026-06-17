@@ -432,18 +432,18 @@ def tela_login():
         [data-testid="stSidebar"] { display: none; }
         .block-container { padding-top: 2rem !important; }
 
-        /* Inputs no login — texto branco */
+        /* Inputs no login — fundo claro, texto escuro */
         .stTextInput input {
-            background: rgba(255,255,255,0.07) !important;
-            border: 1.5px solid rgba(255,255,255,0.15) !important;
-            color: white !important;
+            background: rgba(255,255,255,0.92) !important;
+            border: 1.5px solid rgba(255,255,255,0.3) !important;
+            color: #0d2137 !important;
             border-radius: 10px !important;
         }
         .stTextInput input:focus {
             border-color: #2196f3 !important;
-            box-shadow: 0 0 0 3px rgba(33,150,243,0.2) !important;
+            box-shadow: 0 0 0 3px rgba(33,150,243,0.25) !important;
         }
-        .stTextInput label { color: rgba(255,255,255,0.6) !important; font-size:0.85rem !important; }
+        .stTextInput label { color: rgba(255,255,255,0.7) !important; font-size:0.85rem !important; }
 
         /* Botão login */
         .stFormSubmitButton button {
