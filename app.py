@@ -18,102 +18,141 @@ st.set_page_config(
     layout="wide"
 )
 
-# CSS personalizado — tons de azul Emogis
+# CSS personalizado — Emogis Design System
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+
     /* Fundo geral */
     .stApp { background-color: #f0f4f8; }
 
+    /* Esconder header padrão do Streamlit */
+    #MainMenu, header, footer { visibility: hidden; }
+
     /* Sidebar */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a3a5c 0%, #0d2137 100%);
+        background: linear-gradient(180deg, #0d1f35 0%, #1a3a5c 100%);
+        border-right: 1px solid #1e4976;
     }
-    [data-testid="stSidebar"] * { color: #e8f0fe !important; }
+    [data-testid="stSidebar"] * { color: #cbd5e1 !important; }
     [data-testid="stSidebar"] .stButton button {
-        background-color: #2196f3;
-        color: white !important;
-        border: none;
+        background-color: rgba(239,68,68,0.15) !important;
+        color: #fca5a5 !important;
+        border: 1px solid rgba(239,68,68,0.3) !important;
         border-radius: 8px;
         width: 100%;
+        margin-top: 8px;
+    }
+    [data-testid="stSidebar"] .stButton button:hover {
+        background-color: rgba(239,68,68,0.3) !important;
     }
 
     /* Tabs */
-    .stTabs [data-baseweb="tab-list"] { background-color: #1a3a5c; border-radius: 8px; padding: 4px; }
-    .stTabs [data-baseweb="tab"] { color: #a0bcd8 !important; border-radius: 6px; }
-    .stTabs [aria-selected="true"] { background-color: #2196f3 !important; color: white !important; }
+    .stTabs [data-baseweb="tab-list"] {
+        background-color: #1a3a5c;
+        border-radius: 10px;
+        padding: 4px;
+        gap: 4px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        color: #7eb3d8 !important;
+        border-radius: 7px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #2196f3 !important;
+        color: white !important;
+        font-weight: 600;
+    }
 
     /* Botão primário */
     .stButton > button[kind="primary"] {
-        background-color: #2196f3;
-        color: white;
+        background: linear-gradient(135deg, #2196f3, #1565c0);
+        color: white !important;
         border: none;
-        border-radius: 8px;
-        padding: 0.5rem 2rem;
+        border-radius: 10px;
+        padding: 0.6rem 2rem;
         font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 12px rgba(33,150,243,0.35);
+        transition: all 0.2s;
     }
-    .stButton > button[kind="primary"]:hover { background-color: #1565c0; }
+    .stButton > button[kind="primary"]:hover {
+        box-shadow: 0 6px 20px rgba(33,150,243,0.5);
+        transform: translateY(-1px);
+    }
 
     /* Botões normais */
     .stButton > button {
         border-radius: 8px;
-        border: 1px solid #2196f3;
+        border: 1px solid #90caf9;
         color: #2196f3;
+        transition: all 0.2s;
     }
 
     /* Métricas */
     [data-testid="metric-container"] {
-        background-color: white;
-        border-radius: 12px;
-        padding: 1rem;
+        background: white;
+        border-radius: 14px;
+        padding: 1.2rem;
+        border: 1px solid #e2e8f0;
         border-left: 4px solid #2196f3;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     }
 
     /* Expanders */
     .streamlit-expanderHeader {
         background-color: white;
-        border-radius: 8px;
+        border-radius: 10px;
         border-left: 3px solid #2196f3;
+        font-weight: 500;
     }
 
     /* Inputs */
-    .stTextInput input, .stTextArea textarea, .stSelectbox select {
-        border-radius: 8px;
-        border: 1px solid #90caf9;
+    .stTextInput input, .stTextArea textarea {
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        font-family: 'Inter', sans-serif;
+        transition: border 0.2s;
     }
     .stTextInput input:focus, .stTextArea textarea:focus {
         border-color: #2196f3;
-        box-shadow: 0 0 0 2px rgba(33,150,243,0.2);
+        box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
     }
 
-    /* Header com logo */
-    .emogis-header {
-        background: linear-gradient(135deg, #1a3a5c 0%, #2196f3 100%);
-        padding: 1rem 2rem;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+    /* Login — fundo escuro full page */
+    .login-bg {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: linear-gradient(135deg, #0d1f35 0%, #0a3055 50%, #0d1f35 100%);
+        z-index: -1;
     }
-    .emogis-header h1 { color: white; margin: 0; font-size: 1.5rem; }
-    .emogis-header p { color: #a0cef8; margin: 0; font-size: 0.9rem; }
-
-    /* Cards de status */
-    .status-pendente { color: #f59e0b; font-weight: 600; }
-    .status-andamento { color: #3b82f6; font-weight: 600; }
-    .status-concluido { color: #10b981; font-weight: 600; }
-    .status-recusado { color: #ef4444; font-weight: 600; }
-
-    /* Formulário de login */
-    .login-container {
-        max-width: 420px;
-        margin: 3rem auto;
-        background: white;
+    .login-card {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 20px;
         padding: 2.5rem;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(26,58,92,0.15);
-        border-top: 4px solid #2196f3;
+        box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    }
+    .login-title {
+        color: white;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 400;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+        opacity: 0.7;
+    }
+    .login-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(33,150,243,0.6), transparent);
+        margin: 1.2rem 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -371,35 +410,87 @@ if "usuario" not in st.session_state:
 # LOGO NO HEADER
 # ----------------------------
 def mostrar_header(titulo_pagina="Requisições Internas"):
-    logo_path = Path("logo.jpg")
+    logo_path = Path("logo.png")
     col_logo, col_titulo = st.columns([1, 6])
     with col_logo:
         if logo_path.exists():
-            st.image(str(logo_path), width=80)
+            st.image(str(logo_path), width=90)
         else:
             st.markdown("🏗️")
     with col_titulo:
-        st.markdown(f"<h2 style='color:#1a3a5c;margin:0;padding-top:8px;'>{titulo_pagina}</h2><p style='color:#64748b;margin:0;'>Emogis — Construção Industrial</p>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='color:#1a3a5c;margin:0;padding-top:12px;font-weight:700;'>{titulo_pagina}</h2><p style='color:#64748b;margin:0;font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;'>Emogis — Construção Industrial</p>", unsafe_allow_html=True)
     st.divider()
 
 # ----------------------------
 # TELA DE LOGIN
 # ----------------------------
 def tela_login():
-    col1, col2, col3 = st.columns([1, 1.5, 1])
+    # Fundo escuro full-page
+    st.markdown("""
+    <style>
+        .stApp { background: linear-gradient(135deg, #0a1628 0%, #0d2645 50%, #0a1628 100%) !important; }
+        [data-testid="stSidebar"] { display: none; }
+        .block-container { padding-top: 2rem !important; }
+
+        /* Inputs no login — texto branco */
+        .stTextInput input {
+            background: rgba(255,255,255,0.07) !important;
+            border: 1.5px solid rgba(255,255,255,0.15) !important;
+            color: white !important;
+            border-radius: 10px !important;
+        }
+        .stTextInput input:focus {
+            border-color: #2196f3 !important;
+            box-shadow: 0 0 0 3px rgba(33,150,243,0.2) !important;
+        }
+        .stTextInput label { color: rgba(255,255,255,0.6) !important; font-size:0.85rem !important; }
+
+        /* Botão login */
+        .stFormSubmitButton button {
+            background: linear-gradient(135deg, #2196f3, #1565c0) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            font-weight: 700 !important;
+            font-size: 1rem !important;
+            padding: 0.65rem !important;
+            width: 100% !important;
+            box-shadow: 0 4px 20px rgba(33,150,243,0.4) !important;
+            letter-spacing: 1px;
+        }
+        .stFormSubmitButton button:hover {
+            box-shadow: 0 6px 28px rgba(33,150,243,0.6) !important;
+            transform: translateY(-1px);
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Partículas decorativas de fundo
+    st.markdown("""
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:0;">
+      <div style="position:absolute;width:300px;height:300px;background:radial-gradient(circle,rgba(33,150,243,0.15),transparent);top:-50px;right:-50px;border-radius:50%;"></div>
+      <div style="position:absolute;width:200px;height:200px;background:radial-gradient(circle,rgba(33,150,243,0.1),transparent);bottom:100px;left:-30px;border-radius:50%;"></div>
+      <div style="position:absolute;width:150px;height:150px;background:radial-gradient(circle,rgba(21,101,192,0.2),transparent);bottom:-30px;right:200px;border-radius:50%;"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 1.2, 1])
     with col2:
-        logo_path = Path("logo.jpg")
+        # Logo
+        logo_path = Path("logo.png")
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
         else:
-            st.markdown("<h1 style='text-align:center;color:#1a3a5c;'>🏗️ EMOGIS</h1>", unsafe_allow_html=True)
+            st.markdown("<h1 style='text-align:center;color:white;font-size:2.5rem;'>🏗️</h1>", unsafe_allow_html=True)
 
-        st.markdown("<h3 style='text-align:center;color:#1a3a5c;margin-bottom:1.5rem;'>Requisições Internas</h3>", unsafe_allow_html=True)
+        # Linha divisória
+        st.markdown("<div style='height:1px;background:linear-gradient(90deg,transparent,rgba(33,150,243,0.5),transparent);margin:1rem 0 1.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align:center;color:rgba(255,255,255,0.45);font-size:0.8rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:1.5rem;'>Requisições Internas</p>", unsafe_allow_html=True)
 
         with st.form("login_form"):
-            login = st.text_input("👤 Utilizador")
-            senha = st.text_input("🔒 Palavra-passe", type="password")
-            entrar = st.form_submit_button("Entrar", use_container_width=True, type="primary")
+            login = st.text_input("Utilizador")
+            senha = st.text_input("Palavra-passe", type="password")
+            entrar = st.form_submit_button("ENTRAR", use_container_width=True)
 
         if entrar:
             usuario = verificar_login(login, senha)
@@ -407,7 +498,9 @@ def tela_login():
                 st.session_state.usuario = usuario
                 st.rerun()
             else:
-                st.error("Utilizador ou palavra-passe inválidos.")
+                st.markdown("<p style='text-align:center;color:#f87171;font-size:0.9rem;margin-top:0.5rem;'>⚠️ Utilizador ou palavra-passe inválidos.</p>", unsafe_allow_html=True)
+
+        st.markdown("<p style='text-align:center;color:rgba(255,255,255,0.2);font-size:0.75rem;margin-top:2rem;'>© 2024 Emogis — Construção Industrial</p>", unsafe_allow_html=True)
 
         st.markdown("<p style='text-align:center;color:#94a3b8;font-size:0.8rem;margin-top:1rem;'>Emogis © 2024 — Construção Industrial</p>", unsafe_allow_html=True)
 
@@ -663,7 +756,7 @@ else:
     usuario = st.session_state.usuario
 
     with st.sidebar:
-        logo_path = Path("logo.jpg")
+        logo_path = Path("logo.png")
         if logo_path.exists():
             st.image(str(logo_path), use_container_width=True)
         st.markdown("---")
