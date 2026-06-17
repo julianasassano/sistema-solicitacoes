@@ -476,10 +476,21 @@ def tela_login():
 
     col1, col2, col3 = st.columns([1, 1.2, 1])
     with col2:
-        # Logo
-        logo_path = Path("logo.png")
-        if logo_path.exists():
-            st.image(str(logo_path), use_container_width=True)
+        # Logo com mix-blend-mode para remover fundo
+        logo_path_jpg = Path("logo.jpg")
+        logo_path_png = Path("logo.png")
+        logo_usado = logo_path_jpg if logo_path_jpg.exists() else (logo_path_png if logo_path_png.exists() else None)
+        if logo_usado:
+            import base64
+            with open(str(logo_usado), "rb") as f:
+                logo_b64 = base64.b64encode(f.read()).decode()
+            ext = "jpeg" if str(logo_usado).endswith(".jpg") else "png"
+            st.markdown(f"""
+            <div style="text-align:center;margin-bottom:0.5rem;">
+              <img src="data:image/{ext};base64,{logo_b64}"
+                   style="width:80%;max-width:300px;mix-blend-mode:screen;filter:brightness(1.05) contrast(1.1);" />
+            </div>
+            """, unsafe_allow_html=True)
         else:
             st.markdown("<h1 style='text-align:center;color:white;font-size:2.5rem;'>🏗️</h1>", unsafe_allow_html=True)
 
