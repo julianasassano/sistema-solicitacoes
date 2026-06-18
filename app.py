@@ -147,13 +147,19 @@ def _enviar(dest, assunto, html):
     try:
         host=st.secrets.get("SMTP_HOST",""); port=int(st.secrets.get("SMTP_PORT",587))
         user=st.secrets.get("SMTP_USER",""); pwd=st.secrets.get("SMTP_PASS","")
-        if not host or not user: return False
+        if not host or not user: return False, "SMTP não configurado"
         msg=MIMEMultipart("alternative"); msg["Subject"]=assunto
         msg["From"]=f"Emogis Requisições <{user}>"; msg["To"]=dest
         msg.attach(MIMEText(html,"html"))
-        with smtplib.SMTP(host,port) as s: s.starttls(); s.login(user,pwd); s.sendmail(user,dest,msg.as_string())
-        return True
-    except: return False
+        with smtplib.SMTP(host,port) as s:
+            s.ehlo()
+            s.starttls()
+            s.ehlo()
+            s.login(user,pwd)
+            s.sendmail(user,dest,msg.as_string())
+        return True, ""
+    except Exception as e:
+        return False, str(e)
 
 def _email_base(inner):
     return f"""<div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;border-radius:16px;overflow:hidden;">
@@ -182,7 +188,7 @@ def notificar_nova(titulo,solicitante,area_destino,obra,prioridade,emails_destin
     html = _email_base(inner)
     todos = list(set(emails_destino + ([email_solicitante] if email_solicitante else [])))
     for e in todos:
-        if e: _enviar(e, f"[Emogis] Nova requisição: {titulo}", html)
+        if e: _enviar(e, f"[Emogis] Nova requisição: {titulo}", html)  # retorna (ok, err) mas ignoramos aqui
 
 def notificar_atualizacao(titulo,novo_status,obs,email_solicitante):
     if not email_solicitante: return
@@ -196,7 +202,7 @@ def notificar_atualizacao(titulo,novo_status,obs,email_solicitante):
     <div style="text-align:center;margin-top:24px;">
       <a href="https://sistema-solicitacoes-mor4pc9vk2pqrwjrxnvblo.streamlit.app" style="background:linear-gradient(135deg,#2196f3,#1565c0);color:#fff;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;">Ver Requisição →</a>
     </div>"""
-    _enviar(email_solicitante, f"[Emogis] Requisição atualizada: {titulo} → {novo_status}", _email_base(inner))
+    _enviar(email_solicitante, f"[Emogis] Requisição atualizada: {titulo} -> {novo_status}", _email_base(inner))
 
 # ─── CONSTANTES ────────────────────────────────────────────────────────────────
 STATUS_OPCOES    = ["Pendente","Em andamento","Concluído","Recusado"]
@@ -509,6 +515,20 @@ def aba_admin():
     host=st.secrets.get("SMTP_HOST","")
     if host:
         st.success(f"✅ Email configurado — a enviar via `{st.secrets.get('SMTP_USER','')}`")
+        st.markdown("**Testar envio de email:**")
+        email_teste = st.text_input("Endereço de teste", value=st.secrets.get("SMTP_USER",""))
+        if st.button("📧 Enviar email de teste"):
+            ok, err = _enviar(email_teste, "[Emogis] Teste de email", _email_base("<p>Este é um email de teste do sistema Emogis.</p>"))
+            if ok:
+                st.success(f"✅ Email enviado com sucesso para {email_teste}!")
+            else:
+                st.error(f"❌ Erro ao enviar: {err}")
+                if "534" in err or "535" in err or "Username and Password" in err:
+                    st.warning("💡 Erro de autenticação — verifique se a App Password está correta nas Secrets.")
+                elif "SSL" in err or "TLS" in err:
+                    st.warning("💡 Erro de SSL — tente mudar SMTP_PORT para 465 nas Secrets.")
+                elif "getaddrinfo" in err or "Name or service" in err:
+                    st.warning("💡 Erro de rede — o servidor SMTP não está acessível.")
     else:
         st.warning("⚠️ Email não configurado. Adicione nas Secrets do Streamlit Cloud:")
         st.code("""SMTP_HOST = "smtp.gmail.com"
